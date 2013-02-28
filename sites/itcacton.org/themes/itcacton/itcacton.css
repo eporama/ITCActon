@@ -1,0 +1,1114 @@
+/* $Id: zen.css,v 1.7 2008/04/20 04:20:27 johnalbin Exp $ */
+
+/*
+ * ZEN STYLES
+ *
+ * This is an example stylesheet. Sub-themes should NOT include the zen/zen.css
+ * file, but instead copy this CSS to their own stylesheets.
+ *
+ * In this stylesheet, we have included all of the classes and IDs from this
+ * theme's tpl.php files. We have also included many of the useful Drupal core
+ * styles to make it easier for theme developers to see them.
+ *
+ * Many of these styles are over-riding Drupal's core stylesheets, so if you
+ * remove a declaration from here, the styles may still not be what you want
+ * since Drupal's core stylesheets are still styling the element. See the
+ * drupal5-reference.css file for a list of all Drupal 5.x core styles.
+ *
+ * In addition to the style declarations in this file, other Drupal styles that
+ * you might want to override or augment are those for:
+ *
+ *   Book Navigation  See line 74  of Zen's drupal5-reference.css file
+ *   Forum            See line 197 of Zen's drupal5-reference.css file
+ *   Menus            See line 667 of Zen's drupal5-reference.css file
+ *   News Aggregator  See line 20  of Zen's drupal5-reference.css file
+ *   Polls            See line 287 of Zen's drupal5-reference.css file
+ *   Search           See line 320 of Zen's drupal5-reference.css file
+ *   User Profiles    See line 945 of Zen's drupal5-reference.css file
+ */
+
+
+/** body **/
+  body
+  {
+	background-color: #C00;
+	background-image: url(img/bground_y.png);
+	background-position: center;
+	background-repeat: repeat-y;
+	margin: 0;
+	padding: 0;
+	font-family: Verdana, arial, sans-serif;
+  }
+
+  #page
+  {
+	background-color: #FFF;
+  }
+
+  #page-inner
+  {
+  }
+
+/** header **/
+  #header
+  {
+/*	background-image: url('img/blueslant.png'); */
+	height: 176px;
+	margin-bottom: 0px;
+	margin-top: 0;
+	padding: 0;
+	width: 960px;
+	position: relative;
+  }
+
+  #header-inner
+  {
+  }
+
+  #logo-title /* Wrapper for logo, website name, and slogan */
+  {
+  }
+
+  #logo /* Wrapper for logo */
+  {
+  padding-top: 9px;
+  padding-left: 10px;
+  margin:0;
+  float: none;
+  position: absolute;
+  left: 0;
+  }
+
+  #logo-image /* The actual logo image */
+  {
+  }
+
+  #site-name /* The name of the website */
+  {
+  text-indent: -9000px;
+  background: transparent url('img/bigger-banner.png') right top no-repeat ;
+  min-height: 170px;
+  padding: 0;
+  margin:0;
+  }
+
+  #site-name a:link,
+  #site-name a:visited
+  {
+    color: #000;
+    text-decoration: none;
+  }
+
+  #site-name a:hover
+  {
+    text-decoration: underline;
+  }
+
+  #site-slogan /* The slogan (or tagline) of a website */
+  {
+  	float: right;
+  	text-indent: -9000px;
+  	width: 206px;
+  	height: 75px;
+  	background: transparent url('img/slogan.png') 0 0 no-repeat;
+  	margin: -50px 0 0;
+  	padding: 0;
+  }
+
+  #header-blocks /* Wrapper for any blocks placed in the header region */
+  {
+  }
+
+/** main (container for everything else) **/
+  #main
+  {
+  }
+
+  #main-inner
+  {
+  padding-right: 2em;
+  }
+  #main p {
+  padding-right: 2em;
+  }
+
+/** content **/
+  #content
+  {
+  	padding-right: 
+  }
+	.with-navbar #content, .with-navbar #sidebar-left, .with-navbar #sidebar-right {
+		margin-top:1.2em;
+	}
+  #content-inner
+  {
+  }
+
+  #mission /* The mission statement of the site (displayed on homepage) */
+  {
+  }
+
+  #content-top /* Wrapper for any blocks placed in the "content top" region */
+  {
+  }
+
+  #content-header /* Wrapper for breadcrumb, title, messages, tabs, and help */
+  {
+  }
+
+  .breadcrumb /* The path to the current page in the form of a list of links */
+  {
+    padding-bottom: 0; /* Undo system.css */
+  }
+  h2, h2 a, h2 a:link, h3 a:visited
+  {
+  	font-family: Verdana, arial, sans-serif;
+	font-size: 1.2em;
+	color: #B22C1B;
+  }
+  h3, h3 a, h3 a:link, h3 a:visited
+  {
+  	font-family: Verdana, arial, sans-serif;
+  	font-size: 1em;
+  	color: #B22C1B;
+  }
+
+  h1.title, /* The title of the page */
+  h2.title, /* Block title or the title of a piece of content when it is given in a list of content */
+  h3.title /* Comment title */
+  {
+    margin: 0;
+    color:#333399;
+	/* font-family: "Trebuchet","Lucida Grande","Lucida Sans Unicode","Lucida Sans",Helvetica,Arial,sans-serif; */
+	font-family: "Times New Roman", "Times", serif;
+	font-weight: normal;
+  }
+  
+  body.front h1.title /* Title of the <front> page> */
+  {
+  	color: #B22C1B;
+  	margin-top: 1.25em;
+  }
+  
+  div.messages /* Important messages (status, warning, and error) for the user */
+  {
+    margin: 0 1em 5px 1em;
+    border: 2px solid #ccc;
+    padding: 5px;
+    color: #000;
+    background-color: #fff;
+    font-style: italic;
+  }
+
+  div.status /* Normal priority messages */
+  {
+  }
+
+  div.warning /* Medium priority messages */
+  {
+    /* border: 1px solid #f0c020; */ /* Drupal core uses: 1px solid #f0c020 */
+  }
+
+  div.warning,
+  tr.warning,
+  body.section-admin tr.warning
+  {
+    /* color: #220; */ /* Drupal core uses #220 */
+    background: #ffd;
+  }
+
+  div.error /* High priority messages. See also the .error declaration below. */
+  {
+    /* border: 1px solid #d77; */ /* Drupal core uses: 1px solid #d77 */
+  }
+
+  div.error,
+  tr.error,
+  body.section-admin tr.error
+  {
+    /* color: #200; */ /* Drupal core uses #200 */
+  }
+
+  div.tabs /* See also the tabs.css file. */
+  {
+  }
+
+  .help /* Help text on a page */
+  {
+    margin: 1em 0;
+  }
+
+  .more-help-link /* Link to more help */
+  {
+    font-size: 0.85em;
+    text-align: right;
+  }
+
+  #content-area /* Wrapper for the actual page content */
+  {
+  }
+
+  .pager /* A list of page numbers when more than 1 page of content is available */
+  {
+    clear: both;
+    margin: 1em 0;
+    text-align: center;
+  }
+
+  .pager a, .pager strong.pager-current
+  {
+    padding: 0.5em;
+  }
+
+  .feed-icons /* The links to the RSS or Atom feeds for the current list of content */
+  {
+    margin: 1em 0;
+  }
+
+  #content-bottom /* Wrapper for any blocks placed in the "content bottom" region */
+  {
+  }
+
+/** navbar **/
+  #navbar
+  {
+  }
+
+  #navbar-inner
+  {
+  }
+
+  #search-box /* Wrapper for the search form */
+  {
+  }
+
+  #edit-search-theme-form-1-wrapper label /* Label that says "Search this site:" */
+  {
+    display: none;
+  }
+  
+
+  #primary /* Primary links */
+  {
+	  margin-left:0;
+  }
+	#primary ul.menu {
+		list-style: none;
+		margin: 0 0 0 5px;
+		padding: 0;
+	}
+	#primary li a {
+	/*			background: #FFF url('img/bluebottom.png') bottom left no-repeat;  */
+		margin: 10px 0 0 5px;
+		padding: 6px;
+		display: block;
+		background: url('img/bottomright.png') bottom right no-repeat;
+	}
+	#primary li {
+		list-style: none;
+		list-style-image: none !important;
+		text-transform: uppercase;
+		background: url('img/topleft.png') top left no-repeat;
+	}
+	#primary li.Who_We_Are
+	{
+		background-color: #7DA42E;
+	}
+	#primary li.What_We_Believe
+	{
+		background-color: #B22C1B;
+	}
+	#primary li.Our_Programs
+	{
+		background-color: #00529B;
+	}
+	#primary li.News_Events
+		{
+		background-color: #E38D1A;
+	}
+	#primary li.Support_ITC
+	{
+		background-color: #592989;
+	}
+	#primary a {
+		letter-spacing: .1em;
+		text-transform: normal;
+		font-family: "Lucida Grande","Lucida Sans Unicode","Lucida Sans",Helvetica,Arial,sans-serif;
+		font-size: .9em;
+	  /*background:  transparent url('img/bluetop.png') top left no-repeat; 
+		width: 140px;*/
+		color: #FFF;
+		text-decoration: none;				
+	}
+	#primary  a:hover {
+		text-decoration: underline;
+	}
+	#primary ul ul {
+		list-style: circle;
+	}
+	#primary ul ul li {
+		text-transform: none;
+		line-height: 1;
+		background-color: #FFF !important;
+		background-image: none;
+	}
+	#primary ul ul li a {
+		font-size: .9em;
+		font-weight: bold;
+		margin: 0;
+		background: #FFF !important;
+		background-image: none !important;
+		color: #333 !important;
+	}
+	
+  #block-menu-menu-forlink {
+  	margin-top:2em;
+  }
+  
+  #block-menu-menu-forlink a {
+    text-decoration: none;
+  }
+  
+  #block-menu-menu-forlink a:hover {
+    text-decoration: underline;
+  }
+  #block-menu-menu-forlink a, #block-menu-menu-forlink a:visited {
+  	color: #333399;
+	}  
+  #block-menu-menu-forlink a.active, #block-menu-menu-forlink a.active:visited {
+  	color: #000;
+	}  
+
+  #block-menu-menu-forlink ul li{
+  	list-style-image: url(img/for_arrow.png);
+  	margin: .75em 0;
+  }
+  #block-menu-menu-forlink ul ul {
+    padding: 0 0 0 1em;
+  	margin-top: .5em;
+  }
+  #block-menu-menu-forlink ul li li {
+  	list-style: none;
+  	font-size: .8em;
+  	line-height: 1.2;
+  	margin: .75em 0;
+  	padding: 0;
+  }
+  
+  
+  #secondary /* Secondary links */
+  {
+  }
+
+/** sidebar-left **/
+  #sidebar-left
+  {
+  }
+
+  #sidebar-left-inner
+  {
+  }
+
+/** sidebar-right **/
+  #sidebar-right
+  {
+  }
+
+  #sidebar-right-inner
+  {
+  }
+
+/** footer **/
+	#footer {
+		background: #CCCCFF url('img/footerslant.png') top left no-repeat;
+		padding: 72px 1em 1em 1em;
+		text-align: center;
+		clear: both;
+	}
+	#footer ul {
+		position: relative;
+		list-style-type: none;
+		padding: 0;
+		text-align: center;
+	}
+	#footer ul li {
+		display: inline;
+		padding: 0 .5em;
+		border-right: 1px solid #333;
+	}
+	#footer ul li a {
+		padding: 0 .5em;
+		text-decoration: none;
+		margin: 0;
+	}
+	#footer ul li.last {
+		border-right: none;
+	}
+	#footer ul li a:hover {
+		text-decoration: underline;
+	}
+
+  #footer-inner
+  {
+  }
+
+  #footer-message /* Wrapper for the footer message from Drupal's "Site information"
+                     and for any blocks placed in the footer region */
+  {
+  }
+
+/** closure **/
+  #closure-blocks /* Wrapper for any blocks placed in the closure region */
+  {
+  }
+
+/** Drupal nodes **/
+  .node /* Node wrapper */
+  {
+  }
+
+  .node-inner /* Additional wrapper for node */
+  {
+  }
+
+  .sticky /* A sticky node (displayed before others in a list) */
+  {
+  }
+
+  .node-unpublished /* Unpublished nodes */
+  {
+    /* background-color: #fff4f4; */ /* Drupal core uses a #fff4f4 background */
+  }
+
+  .node-unpublished div.unpublished, /* The word "Unpublished" displayed beneath the content. */
+  .comment-unpublished div.unpublished
+  {
+    height: 0;
+    overflow: visible;
+    color: #d8d8d8;
+    font-size: 75px;
+    line-height: 1;
+    font-family: Impact, "Arial Narrow", Helvetica, sans-serif;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+    word-wrap: break-word; /* A very nice CSS3 property */
+  }
+
+  .node-mine /* A node created by the current user */
+  {
+  }
+
+  .node-teaser /* A node displayed as teaser */
+  {
+  }
+
+  /* All nodes are given a node-type-FOO class that describes the type of
+   * content that it is. If you create a new content type called
+   * "my-custom-type", it will receive a "node-type-my-custom-type" class.
+   */
+  .node-type-page /* Page content node */
+  {
+  }
+
+  .node-type-story /* Story content node */
+  {
+  }
+
+  .node h2.title /* Node title */
+  {
+  }
+
+  .marker /* "New" or "Updated" marker for content that is new or updated for the current user */
+  {
+    color: #c00;
+  }
+
+  .node .picture /* The picture of the node author */
+  {
+  }
+
+  .node.node-unpublished .picture,
+  .comment.comment-unpublished .picture
+  {
+    position: relative; /* Otherwise floated pictures will appear below the "Unpublished" text. */
+  }
+
+  .node .submitted /* The "posted by" information */
+  {
+  }
+
+  .node .taxonomy /* Node taxonomy (categories) */
+  {
+  }
+
+  .node .content /* Node's content wrapper */
+  {
+  	padding-right: 1em;
+  }
+
+  .node div.links /* Wrapper for node links */
+  {
+    margin: 1em 0;
+  }
+
+  ul.links /* Taxonomy links, node links, comment links */
+  {
+    margin: 0;
+    padding: 0;
+  }
+
+  ul.links.inline
+  {
+    display: inline;
+  }
+
+  ul.links li
+  {
+    display: inline;
+    list-style-type: none;
+    padding: 0 0.5em;
+  }
+
+  .preview .node /* Preview of the content before submitting new or updated content */
+  {
+    /* background-color: #ffffea; */ /* Drupal core uses a #ffffea background */
+  }
+
+/** Drupal comments **/
+  #comments /* Wrapper for all comments */
+  {
+    margin: 1em 0;
+  }
+
+  .comment /* Wrapper for a single comment */
+  {
+  }
+
+  .comment-inner /* Additional wrapper for a single comment */
+  {
+  }
+
+  .comment.odd /* An odd-numbered comment in the list of comments */
+  {
+  }
+
+  .comment.even /* An even-numbered comment in the list of comments */
+  {
+  }
+
+  .comment-unpublished /* Unpublished comments */
+  {
+    /* background-color: #fff4f4; */ /* Drupal core uses a #fff4f4 background */
+  }
+
+  .comment-unpublished div.unpublished /* The word "Unpublished" displayed beneath the content. See also the div.unpublished declaration in the node section above. */
+  {
+  }
+
+  .comment-by-author /* A comment created by the node's author */
+  {
+  }
+
+  .comment-by-anon /* A comment created by an anonymous user */
+  {
+  }
+
+  .comment-mine /* A comment created by the current user */
+  {
+  }
+
+  .comment h3.title /* Comment title */
+  {
+  }
+
+  .new /* "New" marker for comments that are new for the current user */
+  {
+    color: #c00;
+  }
+
+  .comment .picture /* The picture of the comment author */
+  {
+  }
+
+  .comment .submitted /* The "posted by" information */
+  {
+  }
+
+  .comment .content /* Comment's content wrapper */
+  {
+  }
+
+  .comment div.links /* Wrapper for comment links. See also the ul.links declaration in the node section above. */
+  {
+    margin: 1em 0;
+  }
+
+  .indented /* Nested comments are indented */
+  {
+    /* margin-left: 25px; */ /* Drupal core uses a 25px left margin */
+  }
+
+  .preview .comment /* Preview of the comment before submitting new or updated comment */
+  {
+    /* background-color: #ffffea; */ /* Drupal core uses a #ffffea background */
+  }
+
+/** Drupal blocks **/
+  .block /* Block wrapper */
+  {
+    margin-bottom: 1em;
+  }
+
+  .block.region-odd /* Zebra striping for each block in the region */
+  {
+  }
+
+  .block.region-even /* Zebra striping for each block in the region */
+  {
+  }
+
+  .block.odd /* Zebra striping independent of each region */
+  {
+  }
+
+  .block.even /* Zebra striping independent of each region */
+  {
+  }
+
+  .region-count-1 /* Incremental count for each block in the region */
+  {
+  }
+
+  .count-1 /* Incremental count independent of each region */
+  {
+  }
+
+  .block-inner /* Additional wrapper for block */
+  {
+  }
+
+  .block h2.title /* Block title */
+  {
+  }
+
+  .block .content /* Block's content wrapper */
+  {
+  }
+
+  #block-aggregator-category-1 /* Block for the latest news items in the first category */
+  {
+  }
+
+  #block-aggregator-feed-1 /* Block for the latest news items in the first feed */
+  {
+  }
+
+  #block-block-1 /* First administrator-defined block */
+  {
+  }
+
+  #block-blog-0 /* "Recent blog posts" block */
+  {
+  }
+
+  #block-book-0 /* "Book navigation" block for the current book's table of contents */
+  {
+  }
+
+  #block-comments-0 /* "Recent comments" block */
+  {
+  }
+
+  #block-forum-0 /* "Active forum topics" block */
+  {
+  }
+
+  #block-forum-1 /* "New forum topics" block */
+  {
+  }
+
+  #block-menu-2 /* "Primary links" block */
+  {
+  }
+
+  #block-node-0 /* "Syndicate" block for primary RSS feed */
+  {
+  }
+
+  #block-poll-0 /* "Most recent poll" block */
+  {
+  }
+
+  #block-profile-0 /* "Author information" block for the profile of the page's author */
+  {
+  }
+
+  #block-search-0 /* "Search form" block */
+  {
+  }
+
+  #block-statistics-0 /* "Popular content" block */
+  {
+  }
+
+  #block-user-0 /* "User login form" block */
+  {
+  }
+
+  #block-user-1 /* "Navigation" block for Drupal navigation menu */
+  {
+  }
+
+  #block-user-2 /* "Who's new" block for a list of the newest users */
+  {
+  }
+
+  #block-user-3 /* "Who's online" block for a list of the online users */
+  {
+  }
+
+/** Drupal boxes **/
+  /* Wrapper for Comment form, Comment viewing options, Menu admin, and
+   * Search results.
+   */
+  .box /* Wrapper for box */
+  {
+  }
+
+  .box-inner /* Additional wrapper for box */
+  {
+  }
+
+  .box h2.title /* Box title */
+  {
+  }
+
+  .box .content /* Box's content wrapper */
+  {
+  }
+
+/** Miscellaneous Drupal styles **/
+  .error /* Errors that are separate from div.messages status messages (see above.) */
+  {
+    /* color: #e55; */ /* Drupal core uses a #e55 background */
+  }
+
+  .warning /* Warnings that are separate from div.messages status messages (see above.) */
+  {
+    /* color: #e09010; */ /* Drupal core uses a #e09010 background */
+  }
+
+  .more-link /* Aggregator, blog, and forum more link */
+  {
+    text-align: right;
+  }
+
+  #user-login-form /* Drupal's default login form */
+  {
+    text-align: left;
+  }
+
+  tr.even, tr.odd /* Some tables have rows marked even or odd. See also the ".section-admin tr.even" declaration below. */
+  {
+    border-bottom: none;
+    padding: 0;
+  }
+
+  tr.even
+  {
+    /* background-color: #eee; */ /* Drupal core uses a #eee background */
+  }
+
+  tr.odd
+  {
+    /* background-color: #eee; */ /* Drupal core uses a #eee background */
+  }
+
+  li a.active /* The active item in a Drupal menu */
+  {
+    color: #000;
+  }
+
+
+/** Drupal forms **/
+  .form-item, /* Wrapper for a form element (or group of form elements) and its label */
+  .form-checkboxes,
+  .form-radios
+  {
+    margin: 1em 0;
+  }
+
+  .form-item input.error, /* Highlight the form elements that caused a form submission error */
+  .form-item textarea.error,
+  .form-item select.error
+  {
+    border: 2px solid #c00;
+  }
+
+  .form-item label /* The label for a form element */
+  {
+    display: block;
+    font-weight: bold;
+  }
+
+  .form-item label.option /* The label for a radio button or checkbox */
+  {
+    display: inline;
+    font-weight: normal;
+  }
+
+  .form-required /* The part of the label that indicates a required field */
+  {
+    color: #c00;
+  }
+
+  .form-item .description /* The descriptive help text (separate from the label) */
+  {
+    font-size: 0.85em;
+  }
+
+  .form-checkboxes .form-item, /* Pack groups of checkboxes and radio buttons closer together */
+  .form-radios .form-item
+  {
+    margin: 0.4em 0;
+  }
+
+  .form-submit /* The submit button */
+  {
+  }
+
+  .container-inline div, .container-inline label /* Inline labels and form divs */
+  {
+    display: inline;
+  }
+
+  .tips /* Tips for Drupal's input formats */
+  {
+    margin: 0;
+    padding: 0;
+    font-size: 0.9em;
+  }
+
+/** OpenID **/
+  /* The default styling for the OpenID login link seems to assume Garland's
+   * styling of list items.
+   */
+  #user-login-form ul /* OpenID creates a new ul above the login form's links. */
+  {
+    margin-bottom: 0; /* Position OpenID's ul next to the rest of the links. */
+  }
+
+  #user-login-form li.openid-link, /* The "Log in using OpenID" links. */
+  #user-login li.openid-link
+  {
+    margin-top: 1em;
+    margin-left: -20px; /* Un-do some of the padding on the ul list. */
+  	padding-left: 20px;
+  	background-position: left center;
+  }
+
+  #user-login-form li.user-link, /* The "Cancel OpenID login" links. */
+  #user-login li.user-link
+  {
+    margin-top: 1em;
+  	list-style-type: disc;
+  	list-style-position: outside;
+  }
+
+  #user-login li.openid-link, /* The OpenID links on the /user form. */
+  #user-login li.user-link
+  {
+    margin-left: -2em; /* Un-do all of the padding on the ul list. */
+  }
+
+/** Drupal admin tables **/
+  /* We overrode these styles in html-elements.css, but restore them for the
+   * admin section of the site.
+   */
+  .section-admin tbody
+  {
+    border-top: 1px solid #ccc;
+  }
+
+  .section-admin th
+  {
+    text-align: left;
+    padding-right: 1em;
+    border-bottom: 3px solid #ccc;
+  }
+
+  .section-admin tbody th
+  {
+    border-bottom: 1px solid #ccc;
+  }
+
+  .section-admin thead th
+  {
+    text-align: left;
+    padding-right: 1em;
+    border-bottom: 3px solid #ccc;
+  }
+
+  .section-admin tr.even,
+  .section-admin tr.odd
+  {
+    background-color: #eee;
+    border-bottom: 1px solid #ccc;
+    padding: 0.1em 0.6em;
+  }
+
+#content-bottom {
+	clear: both;
+}
+#content-bottom div.block {
+	width: 230px;
+	padding: 0 5px;
+	margin: 0;
+	border-right: 1px solid #666;
+	float: left;
+}
+#content-bottom div.content {
+	padding: .5em;
+}
+
+#content-bottom div.region-count-3 {
+	border-right: none;
+}
+
+#content-bottom h2.title /* titles of the bottom three areas of content on <front> */
+{
+    color: #FFFFFF;
+    background: #4D5FAB url('img/topleft.png') top left no-repeat;
+    padding: .25em;
+    font-size: 1.3em;
+    letter-spacing: .2em;
+}
+
+#content-bottom a:link, #content-bottom a:visited
+{	
+	color: #339;
+	text-decoration: none;
+}
+#content-bottom a:hover, #content-bottom a:focus
+{
+	text-decoration: underline;
+}
+#content-bottom .views-field-title {
+	font-weight: bold;
+	padding-top: 1em;
+}
+#content-bottom .views-field-field-date-value
+{
+	font-size: 80%;
+}
+#content-bottom .views-field-view-node {
+	font-size: 80%;
+	margin: 0 0 0 1em;
+}
+
+#content-bottom .views-field-teaser
+{
+	margin-left: 0	0	.25em 1em;
+	font-size: 80%;
+}
+#content-bottom .more-link
+  {
+    text-align: left;
+    margin-top: 1em;
+  }
+
+
+#homepic /* picture on homepage <front> */
+{
+	float: right;
+	padding: 5px 20px;
+}
+
+div.view-announcements .item-list ul li {
+	margin: 1em 0;
+}
+
+a, a:link, a:visited, a:hover, a:active {
+	color: #339;
+}
+
+.view-staff .picture img {
+	float:left;
+	padding:0 1em 1em 0;
+}
+.view-staff span.views-field-value, .view-staff span.views-field-value-1 {
+	font-weight: bold;
+}
+.view-staff table.views-view-grid {
+	width: 100%;
+}
+.view-staff table.views-view-grid tr {
+	vertical-align: top;
+} 
+.view-staff table.views-view-grid td {
+	width: 12.5%;
+}
+
+.view-reading.view-display-id-page_1 .views-field-title {
+	font-size: 1.2em;
+	font-weight: bold;
+	margin-top: 1em;
+}
+.view-reading .views-field-title a {
+	text-decoration: none;
+	color: #B22C1B;
+}
+
+
+table#table-staffinglevels, #table-staffinglevels th, #table-staffinglevels td {
+	border: 1px solid #333;
+	border-collapse: collapse;
+	font-size: 0.9em;
+	padding: .5em 1em;
+	vertical-align: top;
+}
+
+#table-staffinglevels td p {
+	margin: 0 0 .5em 0;
+}
+#table-staffinglevels th {
+	background-color: #E38D1A;
+	font-size: 1em;
+}
+#table-staffinglevels td.group {
+	background-color: #749FC2;
+	font-weight: bold;
+}
+
+div.field-field-pg-image {
+	float: right;
+	padding: 10px;
+}
+
+body.front #header {
+  height: 0;
+}
+
+body.front #site-name {
+  background:none;
+  min-height: inherit;
+}
+
+body.front .with-navbar #sidebar-left {
+  margin-top: 200px;
+}
+
+body.front h1 {
+  font-size: 1.7em;
+ }
+
+#homebanner {
+  margin: 0;
+  padding: 0;
+  width: 600px;
+} 
+/*
+#homebanner {
+  display: none;
+}*/
