@@ -1,2 +1,4 @@
 sites/*/settings.php
+.DS_Store
+._*
 cache
