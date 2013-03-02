@@ -2,3 +2,5 @@ sites/*/settings.php
 .DS_Store
 ._*
 cache
+sites/*/files/css
+sites/*/files/js
