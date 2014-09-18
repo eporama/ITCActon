@@ -47,6 +47,7 @@ Disallow: /search/
 Disallow: /user/register/
 Disallow: /user/password/
 Disallow: /user/login/
+Disallow: /boost_stats.php
 # Paths (no clean URLs)
 Disallow: /?q=admin/
 Disallow: /?q=comment/reply/
