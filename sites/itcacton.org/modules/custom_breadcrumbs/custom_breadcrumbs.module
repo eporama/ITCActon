@@ -1,5 +1,4 @@
 <?php
-// $Id: custom_breadcrumbs.module,v 1.6.2.8 2009/09/30 12:12:11 mgn Exp $
 
 /**
  * @file
@@ -61,8 +60,14 @@ function custom_breadcrumbs_nodeapi($node, $op, $teaser, $page) {
       $titles = preg_split("/[\n]+/", $breadcrumb->titles);
       $paths = preg_split("/[\n]+/", $breadcrumb->paths);
 
-      $titles = module_exists('token') ? token_replace($titles, 'node', $node) : $titles;
-      $paths = module_exists('token') ? token_replace($paths, 'node', $node) : $paths;
+      if (module_exists('token')) {
+        foreach ($titles as $key => $value) {
+          $titles[$key] = token_replace($value, 'node', $node);
+        }
+        foreach ($paths as $key => $value) {
+          $paths[$key] = token_replace($value, 'node', $node);
+        }
+      }
 
       $trail = array(l(t('Home'), '<front>'));
       for ($i = 0; $i < count($titles); $i++) {
@@ -146,17 +151,20 @@ function _custom_breadcrumbs_delete_breadcrumb($bid) {
  *   The desired URI and/or special identifier
  */
 function _custom_breadcrumbs_create_crumb($title, $original_path) {
+  // Decode title to properly handle special characters.
+  $title = decode_entities($title);
   // Collapse double slashes to one.
   $original_path = preg_replace('/\/+/', '/', $original_path);
   // Removing leading and trailing slashes.
   $original_path = preg_replace('/^\/|\/+$/', '', $original_path);
   list($identifier, $path) = explode("|", $original_path, 2);
-
-  if ($path) {
-    switch ($identifier) {
+  if (isset($path) && $path !== '') {
+    switch (trim($identifier)) {
       case '<pathauto>':
-        if (module_exists('pathauto'))
+        if (module_exists('pathauto')) {
+          module_load_include('inc', 'pathauto', 'pathauto');
           $crumb = l($title, pathauto_cleanstring($path, FALSE));
+        }
         break;
       default:
         $crumb = l($title, $original_path);
@@ -166,7 +174,7 @@ function _custom_breadcrumbs_create_crumb($title, $original_path) {
     // This may be just be a single identifier.
     switch ($identifier) {
       case '<none>':
-        $crumb = $title;
+        $crumb = check_plain($title);
         break;
       default:
         $crumb = l($title, $original_path);

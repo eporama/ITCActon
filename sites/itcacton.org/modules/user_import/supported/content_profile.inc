@@ -14,7 +14,7 @@ if (module_exists('node_import') && module_exists('content')) {
   function content_profile_user_import_form_field_match() {
     $options = array();
 		$options['content_profile'] = array();
-		$field_options = array();  
+		$field_options = array();
     $contentprofile_types = content_profile_get_types();
 
     foreach ($contentprofile_types as $type => $data) {
@@ -22,17 +22,17 @@ if (module_exists('node_import') && module_exists('content')) {
 
       // Give fields a more descriptive title.
       foreach (array_keys($fields) as $key) {
-        if (strstr($key, 'cck:field_')) { 
-          $field_options["$type $key"] = t('Content Profile: (!type) !key ', array('!key' => $fields[$key]['title'], '!type' => $type)); 
+        if (strstr($key, 'cck:field_')) {
+          $field_options["$type $key"] = t('Content Profile: (!type) !key ', array('!key' => $fields[$key]['title'], '!type' => $type));
         }
       }
-			
+
       // skip merge if there are no fields on the content type
       if (!empty($field_options)) {
         $options['content_profile'] = array_merge($options['content_profile'], $field_options);
       }
     }
-    
+
     /* We do not support taxonomy yet */
 
     return $options;
@@ -47,6 +47,28 @@ if (module_exists('node_import') && module_exists('content')) {
   }
 
   /**
+   * Implementation of hook_user_import_primary_key_check().
+   */
+  function content_profile_user_import_primary_key_check($field_parts, $value, $update_setting) {
+
+    $field_parts = explode(':', $field_parts);
+    $field_id = $field_parts[1];
+
+    $field = content_fields($field_id);
+    $db_info = content_database_info($field);
+    $uid = db_result(db_query("SELECT n.uid FROM {node} n INNER JOIN {%s} f ON n.nid = f.nid WHERE %s = %s", $db_info['table'], $db_info['columns']['value']['column'], $value));
+
+    // If a match is found and account is not being updated log an error and prevent import.
+    if (!$update_setting && !empty($uid)) {
+      $account = user_load($uid);
+      $error = t('Duplicate import key for !user: %field = %value.', array('!user' => l($account->name, 'user/' . $account->uid), '%field' => $field['widget']['label'], '%value' => $value));
+      user_import_errors($error);
+    }
+
+    return $uid;
+  }
+
+  /**
    * Implementation of hook_user_import_data().
    */
   function content_profile_user_import_data($settings, $update_setting, $column_settings, $module, $field_id, $data, $column_id) {
@@ -58,22 +80,22 @@ if (module_exists('node_import') && module_exists('content')) {
    * Implementation of hook_user_import_after_save().
    */
   function content_profile_user_import_after_save($settings, $account, $password, $fields, $updated, $update_setting_per_module) {
- 
+
     if (!isset($fields['content_profile']) || !is_array($fields['content_profile'])) return;
-    
-    // check if it's an existing user and if content profile is to be updated 
+
+    // check if it's an existing user and if content profile is to be updated
     if ($updated && $update_setting_per_module['content_profile'] == UPDATE_NONE) return;
 
-    // arrange values by content type    
+    // arrange values by content type
     foreach ($fields['content_profile'] as $column_id => $column_data) {
       if (!empty($column_data)) {
         $keys = explode(' ', $column_id);
         $contentprofile[$keys[0]][$keys[1]] = $column_data;
       }
-    } 
+    }
 
     $contentprofile_types = content_profile_get_types();
-    
+
     // process each $content profile
     foreach ($contentprofile_types as $type => $configuration) {
       content_profile_user_import_node($type, $contentprofile, $account, $fields, $updated, $update_setting_per_module['content_profile']);
@@ -86,13 +108,13 @@ if (module_exists('node_import') && module_exists('content')) {
    *  callback to create or update a node if appropriate
    */
   function content_profile_user_import_node($type, $content_profile, $account, $fields, $updated, $update_setting) {
-  
+
     if (empty($content_profile[$type])) return;  // pass only those, which are used
- 
-    $errors = array();      
+
+    $errors = array();
     $title_empty = time();
 
-    if ($updated) { 
+    if ($updated) {
       $node = node_load(array('type' => $type, 'uid' => $account->uid));
     }
 
@@ -100,14 +122,14 @@ if (module_exists('node_import') && module_exists('content')) {
       $node = new StdClass();
       $node->type = $type;
       $node->status = 1;
-      $node->title = $title_empty; 
-    } 
+      $node->title = $title_empty;
+    }
 
-    // Assign the mapped fields to the $node.    
+    // Assign the mapped fields to the $node.
     foreach ($content_profile[$type] as $column_id => $column_data) {
-	
+
     	$field_data = explode(':', $column_id);
-    	$field_name = !empty($field_data[1]) ? $field_data[1] : $column_id; 
+    	$field_name = !empty($field_data[1]) ? $field_data[1] : $column_id;
       $field_key = !empty($field_data[2]) ? $field_data[2] : 'value';
       $field_value = array(0 => array($field_key => $column_data[0]));
 
@@ -118,15 +140,15 @@ if (module_exists('node_import') && module_exists('content')) {
 
         $current_content = content_format($field_name, $node->{$field_name}[0], 'default', $node);
 
-        if (empty($current_content) && !empty($column_data[0])) { 
+        if (empty($current_content) && !empty($column_data[0])) {
 					$node->{$field_name} = $field_value;
         }
       }
       elseif ($updated && $update_setting == UPDATE_REPLACE) {
-        $node->{$field_name} = $field_value; 
-      }  
+        $node->{$field_name} = $field_value;
+      }
     }
-    
+
 		// not actually checking for errors at the moment, but lete's leave this in for when we do
     if (empty($errors)) {
       $node->uid = $account->uid;
@@ -136,24 +158,24 @@ if (module_exists('node_import') && module_exists('content')) {
       if (!isset($node->title) || empty($node->title) || $node->title == $title_empty) {
         $node->title = $node->name;
       }
-      
-      $node = node_submit($node); 
-      
+
+      $node = node_submit($node);
+
       // make sure author is not changed when submited (hapens if existing node)
       $node->uid = $account->uid;
       $node->name = $account->name;
-       
+
       node_save($node);
 
       if (!$node->nid) {
         drupal_set_message(t('Unknown error on saving the node: %node_data! Check watchdog logs for details.', array('%node_data' => "$node->title ($node->type)")), 'error');
       }
-      
+
     } else {
     /**
      * @todo report errors
      */
-    } 
+    }
   }
 
 } else {

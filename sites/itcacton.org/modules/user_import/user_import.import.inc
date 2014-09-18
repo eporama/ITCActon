@@ -1,6 +1,6 @@
 <?php
 
-function _user_import_process($settings) {  
+function _user_import_process($settings) {
   // Load supported modules
   user_import_load_supported();
 
@@ -14,6 +14,7 @@ function _user_import_process($settings) {
 	$username_order = array();
 	$username_abbreviate = array();
 	$first_line_skip = 0;
+  $import_key = isset($settings['options']['import_key']) ? $settings['options']['import_key'] : 'user-mail';
   $delimiter = isset($settings['delimiter']) && !empty($settings['delimiter']) ? $settings['delimiter'] : ',';
 
 	ini_set('auto_detect_line_endings', TRUE);
@@ -24,10 +25,16 @@ function _user_import_process($settings) {
 
 	// start count of imports on this cron run
 	$processed_counter = 0;
-   
+
   while ($data = fgetcsv($handle, $line_max, $delimiter)) {
-    
+
 		$errors = user_import_errors(FALSE, TRUE);
+    $password = '';
+    $account = array();
+    $existing_account = FALSE;
+    $updated = FALSE;
+    unset($fields, $uid);
+    reset($field_match);
 
 		// if importing, check we are not over max number of imports per cron
 		if ($settings['setting'] == 'import' && $processed_counter >= $import_max) {
@@ -41,17 +48,13 @@ function _user_import_process($settings) {
 		if ($line_filled) {
 
 		    // check if this is first line - if so should we skip?
-		    if (!empty($settings['first_line_skip']) && $settings['processed'] == 0) {
+		    if (!empty($settings['first_line_skip']) && $settings['processed'] == 0 && $first_line_skip !== FALSE) {
 	        // reset to false on second process
 	        $first_line_skip = (empty($first_line_skip)) ? TRUE : FALSE;
 		    }
 
 		    if (!$first_line_skip) {
 
-		        unset($errors, $fields);
-		        reset($field_match);
-		        $password = '';
-             
             // Process data cell.
 		        foreach ($field_match as $column_id => $column_settings) {
 
@@ -63,27 +66,38 @@ function _user_import_process($settings) {
 		          if ($type != 'username_part') {
 		            $fields[$type][$field_id] = module_invoke_all('user_import_data', $settings, $update_setting, $column_settings, $type, $field_id, $data, $column_id);
 		          }
+
 		          // Read in data if present for concatenating a user name.
 		          if ($column_settings['username'] > 0) {
-                
+
 		            $username_data[$column_id] = $data[$column_id];
 		            $username_order[$column_id] = $column_settings['username'];
-		            $username_abbreviate[$column_id]= $column_settings['abbreviate']; 
+		            $username_abbreviate[$column_id]= $column_settings['abbreviate'];
 		          }
+
+              // If not using email as primary key check if there is already a user with this value.
+              if ($import_key != 'user-email' && $import_key == $type . '-' . $field_id) {
+                $uid = module_invoke($type, 'user_import_primary_key_check', $field_id, $fields[$type][$field_id][0], $update_setting);
+              }
+
 		        }
 
 		        $errors = user_import_errors();
-		        $account = array();
-		        $existing_account = FALSE;
-		        $updated = FALSE;
 
 		        // if we update existing users matched by email (and therefore passed validation even if this email already exists)
 		        // look for and use an existing account.
-		        if ($update_setting && !empty($fields['user']['email'][0])) {
-		          $existing_account = user_load(array('mail' => $fields['user']['email'][0]));
-		          if ($existing_account) $account = (array) $existing_account; 
+		        if ($update_setting && !empty($fields['user']['email'][0]) && $import_key == 'user-email') {
+
+              $existing_account = user_load(array('mail' => $fields['user']['email'][0]));
+
+              if ($existing_account) $account = (array) $existing_account;
 		        }
-       
+            elseif ($update_setting && $import_key != 'user-email' && !empty($uid)) {
+              $existing_account = user_load($uid);
+
+              if ($existing_account) $account = (array) $existing_account;
+            }
+
 		        // if $account['uid'] is not empty then we can assume the account is being updated
 		        $account_additions = module_invoke_all('user_import_pre_save', $settings, $account, $fields, $errors, $update_setting_per_module);
 
@@ -95,7 +109,7 @@ function _user_import_process($settings) {
 
 		           if ($settings['setting'] == 'import') {
 
-		             if ($existing_account) {  
+		             if ($existing_account) {
 		               $account = user_save($existing_account, $account);
 		               $updated = TRUE;
 		             }
@@ -104,18 +118,17 @@ function _user_import_process($settings) {
 		               $account['name'] = _user_import_create_username($username_order, $username_data, $username_abbreviate, $settings['username_space']);
 		               $password = $account['pass'];
 		               $account = user_save('', $account);
-		             } 
+		             }
 
 		             module_invoke_all('user_import_after_save', $settings, $account, $password, $fields, $updated, $update_setting_per_module);
-		             $processed_counter++; 
+		             $processed_counter++;
 		           }
+
               $settings['processed']++;
-		          $settings['valid']++; 
+		          $settings['valid']++;
 		        }
-    
-		        
 		    }
-		
+
 		    $settings['pointer'] = ftell($handle);
 
 		    // save lines that have fatal errors
@@ -131,7 +144,7 @@ function _user_import_process($settings) {
 
 	// Save progress.
 	$settings['setting'] = _user_import_save_progress($settings['setting'], $remaining_data, $settings['pointer'], $settings['processed'], $settings['valid'], $settings['import_id'], TRUE);
-    
+
   fclose ($handle);
   return $settings;
 }
@@ -148,7 +161,7 @@ function user_import_errors($error = FALSE, $clear = FALSE) {
 function _user_import_create_username($order, $data, $abbreviate, $username_space) {
 
   $username = '';
-	 
+
 	if (is_array($order)) {
 
 	  asort($order);
@@ -161,16 +174,16 @@ function _user_import_create_username($order, $data, $abbreviate, $username_spac
 	    if (!empty($username) && !empty($username_space)) {
 	      $username .= ' ';
 	    }
-	
+
 	    if ($abbreviate[$file_column] == 1) {
 		    //$username .= trim(drupal_strtoupper(chr(ord($data[$file_column]))));
 		    $first_character = trim($data[$file_column]);
 		    $first_character = drupal_substr($first_character, 0, 1);
-        $username .= drupal_strtoupper($first_character);	
+        $username .= drupal_strtoupper($first_character);
 	    }
 	    else {
 		    $username .= trim($data[$file_column]);
-	    } 
+	    }
 
 	  }
 	}
@@ -186,8 +199,8 @@ function _user_import_create_username($order, $data, $abbreviate, $username_spac
  *  conform to Drupal username rules
  */
 function _user_import_sanitise_username($username) {
-  
-  // username cannot contain an illegal character 
+
+  // username cannot contain an illegal character
   $username = preg_replace('/[^\x80-\xF7 [:alnum:]@_.-]/', '', $username);
   $username = preg_replace(
     '/[\x{80}-\x{A0}'.          // Non-printable ISO-8859-1 + NBSP
@@ -199,27 +212,27 @@ function _user_import_sanitise_username($username) {
     '\x{FF01}-\x{FF60}'.      // Full-width latin
     '\x{FFF9}-\x{FFFD}'.      // Replacement characters
     '\x{0}]/u',
-    '', $username); 
-  
+    '', $username);
+
   // username cannot contain multiple spaces in a row
-  $username = preg_replace('/[ ]+/', ' ', $username);   
+  $username = preg_replace('/[ ]+/', ' ', $username);
 
   // username must be less than 56 characters
   $username = substr($username, 0, 56);
 
   // username cannot begin or end with a space
-  $username = trim($username); 
+  $username = trim($username);
   return $username;
 }
 
 /**
- *  deal with duplicate usernames 
+ *  deal with duplicate usernames
  */
 function _user_import_unique_username($username, $start = FALSE) {
 
   static $suffix = 1;
   if ($start) $suffix = 1;
-  
+
   if ($suffix < 2) {
     $duplicate = db_result(db_query("SELECT uid from {users} where name = '%s' LIMIT 1", $username));
   }
@@ -227,19 +240,19 @@ function _user_import_unique_username($username, $start = FALSE) {
     $duplicate = db_result(db_query("SELECT uid from {users} where name = '%s' LIMIT 1", "$username $suffix"));
   }
 
-  // loop until name is valid 
+  // loop until name is valid
   if (!empty($duplicate)) {
     $suffix++;
     _user_import_unique_username($username);
   }
-  
+
   // add number at end of username if it already exists
   $username = ($suffix < 2) ? $username : "$username $suffix";
 
   return $username;
 }
 
-// Update settings for existing import 
+// Update settings for existing import
 function _user_import_settings_update($pointer, $processed, $valid, $setting, $import_id) {
 
   if (empty($import_id)) return;
@@ -251,25 +264,25 @@ function _user_import_random_username() {
     $vowels = 'aoueiy';
     $consonants = 'bcdfghjklmnpqrstvwxz';
     $length = 8;
-    
+
     mt_srand ((double) microtime() * 10000000);
     $next_vowel = 0;
-    
+
     for ($count = 0; $count <= $length; $count++) {
 
         if ($next_vowel) {
             $rand = mt_rand(0, 5);
             $username.= $vowels{$rand};
             $next_vowel = 0;
-    
-        } 
+
+        }
         else {
             $rand = mt_rand(0, 19);
             $username .= $consonants{$rand};
             $next_vowel = 1;
         }
     }
-    
+
     return $username;
 }
 
@@ -279,7 +292,7 @@ function _user_import_update_user_check($settings) {
   foreach ($settings as $setting) {
     if ($setting != UPDATE_NONE) return TRUE;
   }
-  
+
   return FALSE;
 }
 
@@ -287,8 +300,8 @@ function _user_import_errors_display_save($import_id, $data, $email, $errors) {
 
 	$data['email'] = $email;
 
-	db_query("INSERT INTO {user_import_errors} 
-				   (import_id, data, errors) 
+	db_query("INSERT INTO {user_import_errors}
+				   (import_id, data, errors)
 				   VALUES (%d, '%s', '%s')
 				   ", $import_id, serialize($data), serialize($errors));
 	return;
@@ -298,13 +311,13 @@ function _user_import_errors_display_save($import_id, $data, $email, $errors) {
  *  Save progress status and counter of the import.
  */
 function _user_import_save_progress($status, $remaining_data, $pointer, $processed, $valid, $import_id, $status_check = FALSE) {
-	
+
   if ($status_check) {
 	  if ($status == 'import' && !$remaining_data) $status = 'imported';
 	  if ($status == 'test') $status = 'tested';
   }
 
   _user_import_settings_update($pointer, $processed, $valid, $status, $import_id);
-  return $status;	
+  return $status;
 }
 

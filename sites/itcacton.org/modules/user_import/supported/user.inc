@@ -11,11 +11,8 @@ function user_user_import_form_field_match() {
 
   $options = array();
   $options['user']['email'] = t('Email Address*');
-  $options['user']['password'] = t('Password'); 
+  $options['user']['password'] = t('Password');
   $options['user']['roles'] = t('Roles');
-	// $options['user']['username'] = t('Username');
-	// $options['user']['uid'] = t('UID');
-	// $options['user']['modified'] = t('Modified');
   return $options;
 }
 
@@ -36,6 +33,7 @@ function user_user_import_form_fieldset($import, $collapsed) {
  * Implementation of hook_user_import_form_update_user().
  */
 function user_user_import_form_update_user() {
+  $form['mail'] = array('title' => t('Email'), 'description' => t("Affected: email address (if this is set Email Address can't be used as Import Key)."), 'exclude_add' => TRUE);
   $form['roles'] = array('title' => t('Roles'), 'description' => t('Affected: roles assigned to user.'));
   $form['password'] = array('title' => t('Password'), 'description' => t('Affected: password.'), 'exclude_add' => TRUE);
   $form['contact'] = array('title' => t('Contact'), 'description' => t('Affected: user contact option.'), 'exclude_add' => TRUE);
@@ -44,14 +42,14 @@ function user_user_import_form_update_user() {
 
 /**
  * Implementation of hook_user_import_data().
- */  
+ */
 function user_user_import_data($settings, $update_setting, $column_settings, $module, $field_id, $data, $column_id) {
 
   if ($module != 'user') return;
 
   if ($field_id == 'email') {
     $value = trim($data[$column_id]);
-  
+
     _user_import_validate_email($value, $update_setting);
   }
 
@@ -70,11 +68,9 @@ function user_user_import_data($settings, $update_setting, $column_settings, $mo
  * Implementation of hook_user_import_pre_save().
  */
 function user_user_import_pre_save($settings, $account, $fields, $errors, $update_setting_per_module) {
- 
-  $account_add['mail'] = $fields['user']['email'][0];
 
-  if (!empty($account['uid'])) {     
-  
+  if (!empty($account['uid'])) {
+
     // update roles
     switch ($update_setting_per_module['roles']) {
       case UPDATE_ADD:
@@ -82,7 +78,7 @@ function user_user_import_pre_save($settings, $account, $fields, $errors, $updat
         foreach ($account['roles'] as $rid => $role_name) {
           $account_add['roles'][$rid] = $rid;
         }
-      
+
       case UPDATE_REPLACE:
         // update roles
         if (!isset($account_add['roles'])) {
@@ -91,13 +87,13 @@ function user_user_import_pre_save($settings, $account, $fields, $errors, $updat
 
         foreach ($settings['roles'] as $rid => $role_set) {
           if (!empty($role_set)) {
-						$account_add['roles'][$rid] = $rid;	
-					} 
+						$account_add['roles'][$rid] = $rid;
+					}
         }
 
         break;
     }
-    
+
 		// update password
 		if ($update_setting_per_module['password'] == UPDATE_REPLACE) {
     	$account_add['pass'] = (empty($fields['user']['password'][0])) ? user_password() : $fields['user']['password'][0];
@@ -105,18 +101,26 @@ function user_user_import_pre_save($settings, $account, $fields, $errors, $updat
 		else {
 			$account_add['pass'] = "";
 		}
-    
+
 		// update contact
 		if ($update_setting_per_module['contact'] == UPDATE_REPLACE) {
 			$account_add['contact'] = $settings['contact'];
-		} 
+		}
 		else {
 			$account_add['contact'] = isset($account['contact']) ? $account['contact'] : '';
 		}
 
-  } 
-  else {
+    // Update email address
+    if ($update_setting_per_module['mail'] == UPDATE_REPLACE) {
+      $account_add['mail'] = $fields['user']['email'][0];
+    }
+    else {
+      $account_add['mail'] = $account['mail'];
+    }
 
+  }
+  else {
+    $account_add['mail'] = $fields['user']['email'][0];
     $account_add['timezone'] = '-18000';
     $account_add['status'] = 1;
     $account_add['init'] = $fields['user']['email'][0];
@@ -126,13 +130,13 @@ function user_user_import_pre_save($settings, $account, $fields, $errors, $updat
       $account_add['access'] = time();
       $account_add['login'] = time();
     }
-  
+
     // add selected roles
     foreach ($settings['roles'] as $rid => $role_set) {
       if (!empty($role_set)) $account_add['roles'][$rid] = $rid;
     }
   }
-  
+
   return $account_add;
 }
 
@@ -149,23 +153,23 @@ function user_user_import_after_save($settings, $account, $password, $fields, $u
   return;
 }
 
-function user_user_import_edit_roles_fields(&$form, $import, $collapsed) { 
-  $roles = array();    
+function user_user_import_edit_roles_fields(&$form, $import, $collapsed) {
+  $roles = array();
   $roles_data = user_roles();
 
   // remove 'anonymous user' option
   while (list ($rid, $role_name) = each ($roles_data)) {
     if ($role_name != 'anonymous user' && $role_name != 'authenticated user') $roles[$rid] = $role_name;
   }
-  
+
   // roles selected
   if ( !empty($import['roles']) ) {
     foreach ($import['roles'] as $rid) {
       if ($rid != 0) $roles_selected[] = $rid;
-    } 
+    }
   }
-  
-  if (empty($roles_selected)) $roles_selected[] = 2; 
+
+  if (empty($roles_selected)) $roles_selected[] = 2;
 
   $form['role_selection'] = array(
       '#type' => 'fieldset',
@@ -174,9 +178,9 @@ function user_user_import_edit_roles_fields(&$form, $import, $collapsed) {
       '#collapsible' => TRUE,
       '#collapsed' => $collapsed,
   );
-  
+
   $form['role_selection']['roles'] = array(
-      '#title' => t('Assign Role(s) To All Users'), 
+      '#title' => t('Assign Role(s) To All Users'),
       '#type' => 'checkboxes',
       '#options' => $roles,
       '#default_value' => $roles_selected,
@@ -189,11 +193,11 @@ function user_user_import_edit_roles_fields(&$form, $import, $collapsed) {
       '#default_value' => isset($import['roles_new']) ? $import['roles_new'] : 0,
       '#description' => t('Create imported role(s) that are not found and assign it to the user, in addition to any role(s) selected above. Warning: incorrect roles will be created if the incoming data includes typos.'),
   );
-  
+
   return;
 }
 
-function user_user_import_edit_email_fields(&$form, $import, $collapsed) { 
+function user_user_import_edit_email_fields(&$form, $import, $collapsed) {
 
     $form['email_message'] = array(
         '#type' => 'fieldset',
@@ -208,29 +212,29 @@ function user_user_import_edit_email_fields(&$form, $import, $collapsed) {
       '#title' => t('Message Subject'),
       '#default_value' => isset($import['subject']) ? $import['subject'] : '',
       '#description' => t('Customize the subject of the welcome e-mail, which is sent to imported members.') .' '. t('Available variables are:') .' !username, !site, !password, !uri, !uri_brief, !mailto, !date, !login_uri, !edit_uri, !login_url.',
-    ); 
-    
+    );
+
     $form['email_message']['message'] = array(
       '#type' => 'textarea',
       '#title' => t('Message'),
       '#default_value' => isset($import['message']) ? $import['message'] : '',
       '#description' => t('Customize the body of the welcome e-mail, which is sent to imported members.') .' '. t('Available variables are:') .' !username, !site, !password, !uri, !uri_brief, !mailto, !login_uri, !edit_uri, !login_url.',
-    ); 
-    
+    );
+
     $form['email_message']['message_format'] = array(
       '#type' => 'radios',
       '#title' => t('Email Format'),
       '#default_value' => isset($import['message_format']) ? $import['message_format'] : 0,
       '#options' => array(t('Plain Text'), t('HTML')),
     );
-    
+
     $form['email_message']['message_css'] = array(
       '#type' => 'textarea',
       '#title' => t('CSS'),
       '#default_value' => isset($import['message_css']) ? $import['message_css'] : '',
       '#description' => t('Use if sending HTML formated email.'),
     );
-    
+
     return;
 }
 
@@ -255,10 +259,10 @@ function user_user_import_roles_data($data, $new_roles_allowed) {
 
   if (empty($data)) return;
   $values = explode( ',', $data);
-  
+
   // check if any roles are specified that don't already exist
   $existing_roles = user_roles();
- 
+
   foreach($values as $piece) {
     $role = trim($piece);
     $unrecognised = array();
@@ -274,13 +278,13 @@ function user_user_import_roles_data($data, $new_roles_allowed) {
 		}
 
   }
-  
+
   if (!empty($unrecognised)) {
 		user_import_errors(t('The following unrecognised roles were specified: ') . implode(',', $unrecognised));
   }
-  
-  return $roles;	
-} 
+
+  return $roles;
+}
 
 /**
  * Return an existing user ID, if present, for a given email.
@@ -293,13 +297,13 @@ function _user_import_existing_uid($email) {
 function user_user_import_after_save_role($account, $new_roles_allowed, $account_roles, $roles) {
 
   $existing_roles = user_roles();
-  
+
   // if roles were specified, add to existing roles
   $assign_roles = array();
 
   if (is_array($roles) && !empty($roles)) {
 
-		foreach ($roles as $role) { 
+		foreach ($roles as $role) {
 
 	    if (!empty($role)) {
 			  $key = array_search($role, $existing_roles);
@@ -312,7 +316,7 @@ function user_user_import_after_save_role($account, $new_roles_allowed, $account
 			  $assign_roles[$key] = $role;
 			}
 		}
-	
+
 		$need_update = FALSE;
 
  	  foreach ($assign_roles as $key => $role) {
@@ -321,11 +325,11 @@ function user_user_import_after_save_role($account, $new_roles_allowed, $account
 		    $account_roles[$key] = $role;
 		  }
  	  }
-	
+
 		if ($need_update) {
-			
+
 			user_save($account, array('roles' => $account_roles));
-	  }  
+	  }
   }
 
   return;
