@@ -305,6 +305,30 @@ function timer_stop($name) {
  *
  * 13. $confdir/default
  *
+ * If a file named sites.php is present in the $confdir, it will be loaded
+ * prior to scanning for directories.  It should define an associative array
+ * named $sites, which maps domains to directories.  It should be in the form
+ * of:
+ *
+ * $sites = array(
+ *   'The url to alias' => 'A directory within the sites directory'
+ * );
+ *
+ * For example:
+ *
+ * $sites = array(
+ *   'devexample.com' => 'example.com',
+ *   'localhost.example' => 'example.com',
+ * );
+ *
+ * The above array will cause Drupal to look for a directory named
+ * "example.com" in the sites directory whenever a request comes from
+ * "example.com", "devexample.com", or "localhost/example". That is useful
+ * on development servers, where the domain name may not be the same as the
+ * domain of the live server.  Since Drupal stores file paths into the database
+ * (files, system table, etc.) this will ensure the paths are correct while
+ * accessed on development servers.
+ *
  * @param $require_settings
  *   Only configuration directories with an existing settings.php file
  *   will be recognized. Defaults to TRUE. During initial installation,
@@ -324,12 +348,22 @@ function conf_path($require_settings = TRUE, $reset = FALSE) {
   }
 
   $confdir = 'sites';
+
+  $sites = array();
+  if (file_exists($confdir . '/sites.php')) {
+    // This will overwrite $sites with the desired mappings.
+    include($confdir . '/sites.php');
+  }
+
   $uri = explode('/', $_SERVER['SCRIPT_NAME'] ? $_SERVER['SCRIPT_NAME'] : $_SERVER['SCRIPT_FILENAME']);
   $server = explode('.', implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.')))));
   for ($i = count($uri) - 1; $i > 0; $i--) {
     for ($j = count($server); $j > 0; $j--) {
       $dir = implode('.', array_slice($server, -$j)) . implode('.', array_slice($uri, 0, $i));
-      if (file_exists("$confdir/$dir/settings.php") || (!$require_settings && file_exists("$confdir/$dir"))) {
+      if (isset($sites[$dir]) && file_exists($confdir . '/' . $sites[$dir])) {
+        $dir = $sites[$dir];
+      }
+      if (file_exists($confdir . '/' . $dir . '/settings.php') || (!$require_settings && file_exists($confdir . '/' . $dir))) {
         $conf = "$confdir/$dir";
         return $conf;
       }
@@ -364,7 +398,14 @@ function drupal_unset_globals() {
  *  TRUE if only containing valid characters, or FALSE otherwise.
  */
 function drupal_valid_http_host($host) {
-  return preg_match('/^\[?(?:[a-z0-9-:\]_]+\.?)+$/', $host);
+  // Limit the length of the host name to 1000 bytes to prevent DoS attacks with
+  // long host names.
+  return strlen($host) <= 1000
+    // Limit the number of subdomains and port separators to prevent DoS attacks
+    // in conf_path().
+    && substr_count($host, '.') <= 100
+    && substr_count($host, ':') <= 100
+    && preg_match('/^\[?(?:[a-zA-Z0-9-:\]_]+\.?)+$/', $host);
 }
 
 /**
