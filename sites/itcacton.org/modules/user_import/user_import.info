@@ -6,9 +6,9 @@ core = 6.x
 
 
 
-; Information added by Drupal.org packaging script on 2014-04-07
-version = "6.x-4.3"
+; Information added by Drupal.org packaging script on 2015-04-01
+version = "6.x-4.4"
 core = "6.x"
 project = "user_import"
-datestamp = "1396836259"
+datestamp = "1427908395"
 

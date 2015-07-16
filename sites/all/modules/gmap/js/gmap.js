@@ -239,13 +239,14 @@ Drupal.gmap.addHandler('gmap', function (elem) {
     // Respond to incoming control type changes.
     _ib.ctc = obj.bind("controltypechange", function () {
         if (obj.vars.controltype === 'Small') {
-            obj.map.setOptions({navigationControlOptions: {style: google.maps.NavigationControlStyle.SMALL}});
+            obj.map.setOptions({zoomControlOptions: {style: google.maps.ZoomControlStyle.SMALL}});
         }
         else if (obj.vars.controltype === 'Large') {
-            obj.map.setOptions({navigationControlOptions: {style: google.maps.NavigationControlStyle.ZOOM_PAN}});
+            obj.map.setOptions({zoomControlOptions: {style: google.maps.ZoomControlStyle.LARGE}});
         }
+        // obsolete
         else if (obj.vars.controltype === 'Android') {
-            obj.map.setOptions({navigationControlOptions: {style: google.maps.NavigationControlStyle.ANDROID}});
+            obj.map.setOptions({zoomControlOptions: {style: google.maps.ZoomControlStyle.SMALL}});
         }
     });
     // Send out outgoing control type changes.
@@ -330,17 +331,23 @@ Drupal.gmap.addHandler('gmap', function (elem) {
         else if (obj.vars.mtc === 'menu') {
             opts.mapTypeControlOptions.style = google.maps.MapTypeControlStyle.DROPDOWN_MENU;
         }
+        else if (obj.vars.mtc === 'none') {
+            opts.mapTypeControl = false;
+        }
 
         // Navigation control type
         if (obj.vars.controltype !== 'None') {
-            opts.navigationControl = true;
+            opts.zoomControl = true;
+            // needs its own switch
+            opts.panControl = true;
         }
         if (obj.vars.controltype === 'Small') {
-            opts.navigationControlOptions = {style: google.maps.NavigationControlStyle.SMALL};
+            obj.zoomControlOptions = {style: google.maps.ZoomControlStyle.SMALL};
         }
         else if (obj.vars.controltype === 'Large') {
-            opts.navigationControlOptions = {style: google.maps.NavigationControlStyle.ZOOM_PAN};
+            obj.zoomControlOptions = {style: google.maps.ZoomControlStyle.LARGE};
         }
+
 
         // Set scale control visibility
         opts.scaleControl = obj.vars.behavior.scale;

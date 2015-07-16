@@ -5,6 +5,69 @@
  * Provide administration configuration pages to import users.
  */
 
+function user_import_confirm_delete($form_state, $import_id) {
+
+  $form['import_id'] = array(
+    '#type' => 'value',
+    '#value' => $import_id,
+  );
+
+  return confirm_form($form,
+    t('Are you sure you want to delete the user import process?'),
+    'admin/people/user_import',
+    t('Delete this user import process, the file from which user data was being read must be deleted manualy. This action cannot be undone.'),
+    t('Delete'), t('Cancel')
+  );
+}
+
+function user_import_confirm_delete_submit($form, &$form_state) {
+  if ($form_state['values']['confirm']) {
+    user_import_delete($form_state['values']['import_id']);
+  }
+}
+
+function user_import_confirm_continue($form_state, $import_id) {
+
+  $form['import_id'] = array(
+    '#type' => 'value',
+    '#value' => $import_id,
+  );
+
+  return confirm_form($form,
+    t('Are you sure you want to continue to import users?'),
+    'admin/people/user_import',
+    t('Restart user import from where it last stopped.'),
+    t('Continue'), t('Cancel')
+  );
+}
+
+function user_import_confirm_continue_submit($form, &$form_state) {
+  if ($form_state['values']['confirm']) {
+    user_import_continue($form_state['values']['import_id']);
+  }
+}
+
+function user_import_confirm_import($form_state, $import_id) {
+
+  $form['import_id'] = array(
+    '#type' => 'value',
+    '#value' => $import_id,
+  );
+
+  return confirm_form($form,
+    t('Are you sure you want to import users?'),
+    'admin/people/user_import',
+    t('Start importing users.'),
+    t('Import'), t('Cancel')
+  );
+}
+
+function user_import_confirm_import_submit($form, &$form_state) {
+  if ($form_state['values']['confirm']) {
+    user_import_import($form_state['values']['import_id']);
+  }
+}
+
 function user_import_list($action = NULL, $import_id = NULL) {
 
 	// clear incomplete imports
